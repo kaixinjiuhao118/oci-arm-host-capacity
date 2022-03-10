@@ -1,0 +1,64 @@
+名称：测试
+
+上：
+  推：
+    分支机构：
+      -主要
+  拉请求：
+    分支机构：
+      -主要
+
+  时间表：
+    - cron : ' */5 * * * * '
+
+工作：
+  测试：
+    运行：ubuntu-latest
+    策略：
+      矩阵：
+        php 版本：['7.4']
+    名称：集成测试（PHP ${{ matrix.php-versions }}）
+    步骤：
+      -使用：actions/checkout@v1
+      -名称：安装 PHP
+        用途：shivammathur/setup-php@v2
+        与：
+          php 版本：${{ 矩阵.php 版本 }}
+      -名称：验证 composer.json 和 composer.lock
+        运行：作曲家验证
+
+      - name :获取 Composer 缓存目录
+        id :作曲家缓存
+        运行：|
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+      -使用：actions/cache@v2
+        与：
+          路径：${{ steps.composer-cache.outputs.dir }}
+          键：${{ runner.os }}-${{ matrix.php-version }}-composer-${{ matrix.dependencies }}-${{ hashFiles('**/composer.lock') }}
+          恢复键：|
+            ${{ runner.os }}-${{ matrix.php-version }}-composer-${{ matrix.dependencies }}-
+      -名称：安装依赖项
+        运行：|
+          作曲家更新 --prefer-dist --no-progress
+      -名称：运行脚本
+        运行：|
+          php index.php
+        环境：
+          OCI_REGION : ${{ secrets.OCI_REGION }}
+          OCI_USER_ID : ${{ secrets.OCI_USER_ID }}
+          OCI_TENANCY_ID : ${{ 秘密.OCI_TENANCY_ID }}
+          OCI_KEY_FINGERPRINT : ${{ 秘密.OCI_KEY_FINGERPRINT }}
+          OCI_PRIVATE_KEY_FILENAME : ${{ secrets.OCI_PRIVATE_KEY_FILENAME }}
+          OCI_AVAILABILITY_DOMAIN : ${{ secrets.OCI_AVAILABILITY_DOMAIN }}
+          OCI_SUBNET_ID : ${{ secrets.OCI_SUBNET_ID }}
+          OCI_IMAGE_ID : ${{ secrets.OCI_IMAGE_ID }}
+          OCI_OCPUS : ${{ 秘密.OCI_OCPUS }}
+          OCI_MEMORY_IN_GBS : ${{ 秘密.OCI_MEMORY_IN_GBS }}
+          OCI_SHAPE : ${{ 秘密.OCI_SHAPE }}
+          OCI_MAX_INSTANCES : ${{ 秘密.OCI_MAX_INSTANCES }}
+          OCI_SSH_PUBLIC_KEY : ${{ secrets.OCI_SSH_PUBLIC_KEY }}
+          TELEGRAM_USER_ID : ${{ 秘密.TELEGRAM_USER_ID }}
+          TELEGRAM_BOT_API_KEY : ${{ 秘密.TELEGRAM_BOT_API_KEY }}
+          AD_ALWAYS_FREE : ${{ 秘密.AD_ALWAYS_FREE }}
+          TEST_IMAGE_ID : ${{ secrets.TEST_IMAGE_ID }}
+          TEST_SUBNET_ID : ${{ secrets.TEST_SUBNET_ID }}
